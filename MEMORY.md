@@ -20,15 +20,24 @@
 - **Implementación**: Ajuste en `firestore.rules` para permitir `get` y `list` al SuperAdmin sin restricciones de `organizationId`.
 - **Fecha**: 2026-05-03
 
+## Hitos Logrados
+- **CRM SuperAdmin (Data Command Center)**: Implementado componente profesional `SuperAdminCRM.tsx` con métricas globales, gestión multi-tenant de usuarios, propiedades y solicitudes.
+- **Asesora IA de I LIKE**: Integrada con Google Gemini (modelo `gemini-3-flash-preview`). Soporta *Function Calling* para agendar citas directamente en el CRM.
+- **Normalización de Citas**: Las citas generadas por la IA ahora incluyen automáticamente el `organizationId` del usuario, garantizando visibilidad en el calendario.
+- **Refinamiento de UI**: Botones flotantes (WhatsApp e IA) optimizados con contenedor Flexbox para evitar solapamientos y mejorar la estética en dispositivos móviles.
+- **Despliegue Continuo**: Integración total con GitHub y Vercel exitosa.
+
+## Estado Actual de la Aplicación
+1. **Frontend**: React + Vite + Tailwind CSS v4.
+2. **Backend**: Firebase Firestore (Seguridad multi-tenant activa).
+3. **Módulo IA**: Gemini API activa con historial de conversación y herramientas de agenda.
+4. **Despliegue**: [i-like-app-web.vercel.app](https://i-like-app-web.vercel.app).
+
 ## Próximos Pasos (CRM & SuperAdmin)
-1. **Desarrollo del CRM Profesional (SuperAdmin)**:
-   - Crear el componente `SuperAdminCRM.tsx` con un diseño de "Data Command Center" (Bordes afilados, colores de alta visibilidad, denso en información).
-   - Implementar métricas globales: Total de Usuarios, Propiedades Activas, Solicitudes Pendientes y Tasa de Conversión (Leads/Citas).
-   - Añadir tabla de gestión de usuarios con filtros por `organizationId` y rol.
-   - Implementar el "Global Broadcast" para enviar notificaciones a todos los usuarios de la plataforma.
-2. **Auditoría y Telemetría**:
-   - Visualización de movimientos recientes (logs de actividad de usuarios).
-   - Gráficos de rendimiento (CPU Load simulado vs Carga de Datos real).
-3. **Escalabilidad**:
-   - Monitorear rendimiento del sort en memoria si la lista de propiedades supera los 500 registros.
-   - Implementar paginación en el CRM para manejar grandes volúmenes de usuarios y propiedades.
+1. **Auditoría y Telemetría Avanzada**:
+   - Gráficos de rendimiento real (Carga de Datos).
+   - Implementar el "Global Broadcast" para enviar notificaciones a todos los usuarios.
+2. **Optimización de Datos**:
+   - Implementar paginación en el CRM para manejar volúmenes >500 registros.
+3. **Refinamiento IA**:
+   - Añadir más herramientas a la Asesora (consultar precios promedio, filtrar propiedades por zona vía voz).
