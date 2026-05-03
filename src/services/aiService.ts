@@ -1,16 +1,14 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
+import { crmService } from "../features/crm/services/crmService";
+import { auth } from "../lib/firebase";
 
-const API_KEY = process.env.GEMINI_API_KEY;
-
-export async function getAdvisorResponse(query: string, history: { role: 'user' | 'ai', content: string }[] = []) {
-  if (!API_KEY) {
+export async function getAdvisorResponse(query: string, organizationId: string, history: { role: 'user' | 'ai', content: string }[] = []) {
+  if (!process.env.GEMINI_API_KEY) {
     return "Error: GEMINI_API_KEY no configurada. Por favor, asegúrate de que la clave esté disponible en el entorno.";
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
     // Define the scheduling function
     const scheduleAppointmentTool = {
@@ -71,16 +69,14 @@ export async function getAdvisorResponse(query: string, history: { role: 'user' 
       }
 
       try {
-        await addDoc(collection(db, 'appointments'), {
-          userId: auth.currentUser.uid,
+        await crmService.addAppointment({
           userName: args.userName,
           userEmail: auth.currentUser.email || 'N/A',
           date: args.date,
           time: args.time,
-          notes: args.notes || '',
+          notes: args.notes || 'Agendado vía Asesora IA',
           status: 'Pending',
-          createdAt: serverTimestamp()
-        });
+        }, auth.currentUser.uid, organizationId);
         
         return `Confirmado. He registrado su solicitud de cita para el ${args.date} a las ${args.time} con éxito en la terminal. ¿Hay algún otro indicador de mercado que desee analizar?`;
       } catch (dbError) {

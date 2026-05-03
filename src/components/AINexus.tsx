@@ -2,8 +2,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, useRef, useEffect } from 'react';
 import { UserRound, Send, X, MessageSquare, Loader2, Mic, MicOff, Volume2 } from 'lucide-react';
 import { getAdvisorResponse } from '../services/aiService';
+import { useAuth } from '../features/auth/hooks/useAuth';
 
 export default function AINexus() {
+  const { profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([
     { role: 'ai', content: 'Buenas tardes. Terminal de inversión I LIKE Real Estate operativa. Soy su Asesora IA, especializada en la optimización de portafolios dentro del ecosistema inmobiliario metropolitano. Mi función es proporcionar inteligencia de mercado basada en datos precisos para asegurar una ejecución estratégica de alto nivel. Ya sea que su objetivo sea realizar un análisis de rendimiento exhaustivo, evaluar la velocidad urbana de un sector emergente o diversificar mediante la tokenización de activos, estoy preparada para procesar los indicadores clave que maximicen su ROI. ¿Qué segmento del mercado requiere nuestra atención hoy? Podemos iniciar con una evaluación de tasas de capitalización o un mapeo de absorción en distritos de alto potencial.' }
@@ -78,7 +80,8 @@ export default function AINexus() {
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setIsLoading(true);
 
-    const response = await getAdvisorResponse(userMsg, messages);
+    const organizationId = profile?.organizationId || 'default-org';
+    const response = await getAdvisorResponse(userMsg, organizationId, messages);
     setMessages(prev => [...prev, { role: 'ai', content: response }]);
     setIsLoading(false);
     
@@ -88,7 +91,7 @@ export default function AINexus() {
   };
 
   return (
-    <div className="fixed bottom-24 right-8 z-[100] md:bottom-8">
+    <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -166,10 +169,10 @@ export default function AINexus() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-primary text-[#172B36] rounded-full shadow-[0_0_20px_rgba(255,200,1,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        className="w-10 h-10 bg-primary text-[#172B36] rounded-full shadow-[0_0_20px_rgba(255,200,1,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
       >
-        <UserRound className="w-6 h-6" />
+        <UserRound className="w-5 h-5" />
       </button>
-    </div>
+    </>
   );
 }

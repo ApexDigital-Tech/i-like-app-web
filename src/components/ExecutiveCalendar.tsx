@@ -69,9 +69,17 @@ const ExecutiveCalendar: React.FC<ExecutiveCalendarProps> = ({
   const appointmentsByDay = useMemo(() => {
     const map: Record<string, Appointment[]> = {};
     appointments.forEach(app => {
-      const dateKey = app.date; // Use ISO date string directly
-      if (!map[dateKey]) map[dateKey] = [];
-      map[dateKey].push(app);
+      try {
+        // Normalize date format to yyyy-MM-dd for comparison
+        const dateObj = app.date.includes('-') ? parseISO(app.date) : new Date(app.date);
+        const dateKey = format(dateObj, 'yyyy-MM-dd');
+        if (!map[dateKey]) map[dateKey] = [];
+        map[dateKey].push(app);
+      } catch (e) {
+        const dateKey = app.date;
+        if (!map[dateKey]) map[dateKey] = [];
+        map[dateKey].push(app);
+      }
     });
     return map;
   }, [appointments]);

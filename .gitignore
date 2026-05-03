@@ -12,3 +12,5 @@ coverage/
 *.swp
 *.bak
 .gemini/
+*-firebase-adminsdk-*.json
+service-account.json
