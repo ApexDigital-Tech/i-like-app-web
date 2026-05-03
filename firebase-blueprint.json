@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Information about a user of the application.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The full name of the user." },
+        "email": { "type": "string", "format": "email", "description": "The email address of the user." },
+        "image": { "type": "string", "description": "URL to the user's profile image." },
+        "role": { "type": "string", "enum": ["Seller", "Buyer", "Admin"], "description": "The user's role in the system." },
+        "phone": { "type": "string", "description": "The user's phone number." },
+        "bio": { "type": "string", "description": "A short biography of the user." }
+      },
+      "required": ["name", "email", "image", "role"]
+    },
+    "Property": {
+      "title": "Property",
+      "description": "Represents a real estate asset.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "zip": { "type": "string" },
+        "price": { "type": "number" },
+        "beds": { "type": "number" },
+        "baths": { "type": "number" },
+        "sqft": { "type": "number" },
+        "type": { "type": "string", "enum": ["Residential", "Commercial"] },
+        "subType": { "type": "string", "enum": ["House", "Apartment", "Land", "Office", "Other"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "image": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "valuationTrend": { "type": "number" },
+        "interestVelocity": { "type": "number" },
+        "viewingRequests": { "type": "number" },
+        "description": { "type": "string" },
+        "roi": { "type": "number" },
+        "amenities": { "type": "array", "items": { "type": "string" } },
+        "yearBuilt": { "type": "number" },
+        "parking": { "type": "number" },
+        "char1Label": { "type": "string" },
+        "char1Value": { "type": "string" },
+        "char2Label": { "type": "string" },
+        "char2Value": { "type": "string" },
+        "char3Label": { "type": "string" },
+        "char3Value": { "type": "string" },
+        "char4Label": { "type": "string" },
+        "char4Value": { "type": "string" },
+        "verifiedStatus": { "type": "string", "enum": ["unverified", "pending", "verified", "rejected"], "description": "Asset verification status." },
+        "ownerId": { "type": "string", "description": "UID of the user who owns/listed this property." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "location", "price", "type", "subType", "image", "ownerId"]
+    },
+    "PropertyRequest": {
+      "title": "Property Request",
+      "description": "A request posted by a user looking for a property.",
+      "type": "object",
+      "properties": {
+        "user": { "type": "string", "description": "Display name of the requester." },
+        "userId": { "type": "string", "description": "UID of the requester." },
+        "budget": { "type": "number" },
+        "requirements": { "type": "string" },
+        "type": { "type": "string", "enum": ["Buy", "Rent"] },
+        "location": { "type": "string" },
+        "minBeds": { "type": "number" },
+        "minSqft": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "budget", "requirements", "type", "location"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Represents a meeting or viewing request scheduled with a human advisor.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user scheduling the appointment." },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userPhone": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Confirmed", "Cancelled", "Completed"] },
+        "propertyId": { "type": "string" },
+        "notes": { "type": "string" },
+        "outcome": { "type": "string", "description": "Resumen o resultado de la reunión." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userName", "date", "time", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System or user level notifications.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the recipient user." },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "warning", "error"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Collection of user profiles."
+    },
+    "properties/{propertyId}": {
+      "schema": "Property",
+      "description": "Collection of listed properties."
+    },
+    "requests/{requestId}": {
+      "schema": "PropertyRequest",
+      "description": "Collection of property requests."
+    },
+    "appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Collection of scheduled appointments."
+    },
+    "notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Collection of system and user notifications."
+    }
+  }
+}

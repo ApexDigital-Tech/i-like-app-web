@@ -1,0 +1,6 @@
+{
+  "name": "I like",
+  "description": "Una plataforma moderna de bienes raíces con IA, gestión de activos y terminal de inversión de alta velocidad.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}

@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  --color-surface: #172B36; /* Oceanic Noir */
+  --color-surface-card: #114C5A; /* Nocturnal Expedition */
+  --color-primary: #FFC801; /* Forsythia (Yellow) */
+  --color-primary-dim: #FF9932; /* Deep Saffron (Orange) */
+  --color-secondary: #D9E8E2; /* Mystic Mint */
+  --color-tertiary: #F1F6F4; /* Arctic Powder */
+  --color-outline: rgba(241, 246, 244, 0.05);
+  --color-outline-variant: rgba(255, 200, 1, 0.2);
+
+  --radius-3xl: 2.5rem;
+  --radius-2xl: 1.5rem;
+  --radius-xl: 1rem;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-[#F1F6F4] font-sans antialiased;
+    background-image: 
+      radial-gradient(circle at top right, rgba(255, 200, 1, 0.1), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(17, 76, 90, 0.2), transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-surface-card/40 backdrop-blur-3xl;
+    border: 1px solid rgba(241, 246, 244, 0.08);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .btn-joy {
+    @apply relative overflow-hidden bg-primary text-[#172B36] font-display font-black uppercase tracking-widest text-[10px] py-3 px-6 rounded-2xl transition-all hover:scale-105 active:scale-95 hover:shadow-[0_0_30px_rgba(255,200,1,0.4)] disabled:opacity-50;
+  }
+
+  .glow-text-primary {
+    @apply text-primary;
+    text-shadow: 0 0 30px rgba(255, 200, 1, 0.5);
+  }
+
+  .neon-border {
+    @apply border border-primary/20;
+    box-shadow: 0 0 20px rgba(255, 200, 1, 0.1);
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    @apply gap-6;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+}
+
+/* placeholder */

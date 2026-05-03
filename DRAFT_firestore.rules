@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- HELPER FUNCTIONS ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- VALIDATION HELPERS ---
+
+    function isValidProfile(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+          && data.email is string && data.email.size() > 0 && data.email.size() <= 100
+          && data.image is string && data.image.size() <= 500
+          && data.role in ['Seller', 'Buyer', 'Admin']
+          && (!('phone' in data) || (data.phone is string && data.phone.size() <= 50))
+          && (!('bio' in data) || (data.bio is string && data.bio.size() <= 1000))
+          && data.keys().hasAll(['name', 'email', 'image', 'role']);
+    }
+
+    function isValidProperty(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+          && data.location is string && data.location.size() > 0 && data.location.size() <= 200
+          && data.price is number && data.price >= 0
+          && data.type in ['Residential', 'Commercial']
+          && data.subType in ['House', 'Apartment', 'Land', 'Office', 'Other']
+          && data.image is string && data.image.size() <= 500
+          && data.ownerId == request.auth.uid
+          && (!('beds' in data) || (data.beds is number))
+          && (!('baths' in data) || (data.baths is number))
+          && (!('sqft' in data) || (data.sqft is number))
+          && (!('description' in data) || (data.description is string && data.description.size() <= 5000));
+    }
+
+    // --- COLLECTION RULES ---
+
+    // USERS
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid; // Use userId field for filtering if needed
+      allow create: if isOwner(userId) && isValidProfile(incoming());
+      allow update: if isOwner(userId) && isValidProfile(incoming())
+                    && incoming().role == existing().role // Prevent self-promoted Admin
+                    && incoming().email == existing().email // Email immutable
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'image', 'phone', 'bio']);
+    }
+
+    // PROPERTIES
+    match /properties/{propertyId} {
+      allow get: if true; // Public marketplace
+      allow list: if true;
+      allow create: if isSignedIn() && isValidProperty(incoming()) && incoming().createdAt == request.time;
+      allow update: if isOwner(existing().ownerId) && isValidProperty(incoming())
+                    && incoming().ownerId == existing().ownerId
+                    && incoming().createdAt == existing().createdAt
+                    // Actions: Update details
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'location', 'price', 'beds', 'baths', 'sqft', 'type', 'subType', 'tags', 'image', 'description', 'amenities', 'parking', 'yearBuilt', 'roi', 'valuationTrend', 'interestVelocity', 'viewingRequests']);
+      allow delete: if isOwner(existing().ownerId);
+    }
+
+    // REQUESTS
+    match /requests/{requestId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn(); 
+      allow create: if isSignedIn() && isValidRequest(incoming()) && incoming().createdAt == request.time;
+      allow update: if isOwner(existing().userId) && isValidProfile(incoming()) // WAIT, this should be isValidRequest logic
+                    && isOwner(existing().userId)
+                    && (
+                      incoming().userId == existing().userId
+                      && incoming().createdAt == existing().createdAt
+                      && incoming().diff(existing()).affectedKeys().hasOnly(['budget', 'requirements', 'type', 'location', 'minBeds', 'minSqft', 'user'])
+                    );
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

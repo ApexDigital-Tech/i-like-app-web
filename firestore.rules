@@ -1,0 +1,195 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- HELPER FUNCTIONS ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.email.lower() == 'apexdigital70@gmail.com';
+    }
+
+    // SaaS Helpers
+    function getUserOrg() {
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(userPath) ? get(userPath).data.organizationId : 'none';
+    }
+
+    function belongsToOrg(orgId) {
+      return isSignedIn() && (isSuperAdmin() || getUserOrg() == orgId);
+    }
+
+    function isAdmin() {
+      if (isSuperAdmin()) { return true; }
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(userPath) && get(userPath).data.role == 'Admin';
+    }
+
+    function isOwner(userId) {
+      return (isSignedIn() && request.auth.uid == userId) || isAdmin();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- VALIDATION HELPERS ---
+
+    function isValidProfile(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+          && data.email is string && data.email.size() > 0 && data.email.size() <= 100
+          && data.image is string && data.image.size() <= 500
+          && data.role in ['Seller', 'Buyer', 'Admin', 'superadmin']
+          && (data.organizationId is string && data.organizationId.size() > 0)
+          && (!('phone' in data) || (data.phone is string && data.phone.size() <= 64))
+          && (!('bio' in data) || (data.bio is string && data.bio.size() <= 1000))
+          && data.keys().hasAll(['name', 'email', 'image', 'role', 'organizationId']);
+    }
+
+    function isValidProperty(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+          && data.location is string && data.location.size() > 0 && data.location.size() <= 200
+          && data.price is number && data.price >= 0
+          && data.type in ['Residential', 'Commercial']
+          && data.subType in ['House', 'Apartment', 'Land', 'Office', 'Other']
+          && data.image is string && data.image.size() <= 1024
+          && data.ownerId == request.auth.uid
+          && (isSuperAdmin() || data.organizationId == getUserOrg())
+          && (!('beds' in data) || (data.beds is number))
+          && (!('baths' in data) || (data.baths is number))
+          && (!('sqft' in data) || (data.sqft is number))
+          && (!('description' in data) || (data.description is string && data.description.size() <= 5000))
+          && (!('images' in data) || (data.images is list && data.images.size() <= 10))
+          && (!('char1Label' in data) || (data.char1Label is string && data.char1Label.size() <= 200))
+          && (!('char1Value' in data) || (data.char1Value is string && data.char1Value.size() <= 200))
+          && (!('char2Label' in data) || (data.char2Label is string && data.char2Label.size() <= 200))
+          && (!('char2Value' in data) || (data.char2Value is string && data.char2Value.size() <= 200))
+          && (!('char3Label' in data) || (data.char3Label is string && data.char3Label.size() <= 200))
+          && (!('char3Value' in data) || (data.char3Value is string && data.char3Value.size() <= 200))
+          && (!('char4Label' in data) || (data.char4Label is string && data.char4Label.size() <= 200))
+          && (!('char4Value' in data) || (data.char4Value is string && data.char4Value.size() <= 200))
+          && (!('verifiedStatus' in data) || (data.verifiedStatus in ['unverified', 'pending', 'verified', 'rejected']));
+    }
+
+    function isValidRequest(data) {
+      return data.userId == request.auth.uid
+          && (isSuperAdmin() || data.organizationId == getUserOrg())
+          && data.budget is number && data.budget >= 0
+          && data.requirements is string && data.requirements.size() > 0 && data.requirements.size() <= 2000
+          && data.type in ['Buy', 'Rent']
+          && (data.location is string) && (data.location.size() <= 200);
+    }
+
+    function isValidAppointment(data) {
+      return data.userName is string && data.userName.size() > 0 && data.userName.size() <= 200
+          && (isSuperAdmin() || data.organizationId == getUserOrg())
+          && data.date is string && data.date.size() > 0
+          && data.time is string && data.time.size() > 0
+          && data.status in ['Pending', 'Confirmed', 'Cancelled', 'Completed']
+          && (!('userPhone' in data) || (data.userPhone is string && data.userPhone.size() <= 64))
+          && (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 200))
+          && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
+          && (!('outcome' in data) || (data.outcome is string && data.outcome.size() <= 5000))
+          && (!('userId' in data) || (data.userId is string))
+          && (!('propertyId' in data) || (data.propertyId is string && isValidId(data.propertyId)));
+    }
+
+    function isValidNotification(data) {
+      return data.userId is string && data.userId.size() > 0
+          && (isSuperAdmin() || data.organizationId == getUserOrg())
+          && data.title is string && data.title.size() <= 200
+          && data.message is string && data.message.size() <= 1000
+          && data.type in ['info', 'success', 'warning', 'error']
+          && data.read is bool;
+    }
+
+    // --- COLLECTION RULES ---
+
+    // TEST CONNECTION
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // USERS
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
+      allow list: if isSignedIn() && (isSuperAdmin() || belongsToOrg(resource.data.organizationId));
+      allow create: if isSignedIn() && (request.auth.uid == userId);
+      allow update: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
+      allow delete: if isSuperAdmin();
+    }
+
+    // PROPERTIES
+    match /properties/{propertyId} {
+      allow get: if belongsToOrg(resource.data.organizationId);
+      allow list: if belongsToOrg(resource.data.organizationId);
+      allow create: if isSignedIn() && isValidProperty(incoming()) && incoming().createdAt == request.time;
+      allow update: if (isOwner(existing().ownerId) && belongsToOrg(existing().organizationId) && isValidProperty(incoming())
+                    && incoming().ownerId == existing().ownerId
+                    && incoming().organizationId == existing().organizationId
+                    && incoming().createdAt == existing().createdAt
+                    && incoming().verifiedStatus == existing().verifiedStatus
+                    && incoming().diff(existing()).affectedKeys().hasOnly([
+                      'name', 'location', 'price', 'beds', 'baths', 'sqft', 'type', 'subType', 'tags', 
+                      'image', 'images', 'description', 'amenities', 'parking', 'yearBuilt', 'roi', 
+                      'valuationTrend', 'interestVelocity', 'viewingRequests',
+                      'char1Label', 'char1Value', 'char2Label', 'char2Value', 
+                      'char3Label', 'char3Value', 'char4Label', 'char4Value'
+                    ])) || (isAdmin() && belongsToOrg(existing().organizationId) && isValidProperty(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['verifiedStatus']));
+      allow delete: if isOwner(existing().ownerId) && belongsToOrg(existing().organizationId);
+    }
+
+    // REQUESTS
+    match /requests/{requestId} {
+      allow get: if belongsToOrg(resource.data.organizationId);
+      allow list: if belongsToOrg(resource.data.organizationId); 
+      allow create: if isSignedIn() && isValidRequest(incoming()) && incoming().createdAt == request.time;
+      allow update: if isOwner(existing().userId) && belongsToOrg(existing().organizationId) && isValidRequest(incoming())
+                    && incoming().userId == existing().userId
+                    && incoming().organizationId == existing().organizationId
+                    && incoming().createdAt == existing().createdAt
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['budget', 'requirements', 'type', 'location', 'minBeds', 'minSqft', 'user']);
+      allow delete: if isOwner(existing().userId) && belongsToOrg(existing().organizationId);
+    }
+
+    // APPOINTMENTS
+    match /appointments/{appointmentId} {
+      allow get: if isSignedIn() && belongsToOrg(resource.data.organizationId) && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && belongsToOrg(resource.data.organizationId);
+      allow create: if isSignedIn() && isValidAppointment(incoming()) && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && belongsToOrg(existing().organizationId) && (
+        (isOwner(existing().userId) && incoming().userId == existing().userId && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notes', 'date', 'time', 'outcome']) && (incoming().status == 'Cancelled' || existing().status == 'Pending' || isAdmin()))
+        || isAdmin()
+      );
+      allow delete: if isAdmin() && belongsToOrg(existing().organizationId);
+    }
+
+    // NOTIFICATIONS
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn() && belongsToOrg(resource.data.organizationId) && (isOwner(existing().userId) || existing().userId == 'admin' && isAdmin());
+      allow list: if isSignedIn() && belongsToOrg(resource.data.organizationId);
+      allow create: if isSignedIn() && isValidNotification(incoming()) && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && belongsToOrg(existing().organizationId) && (
+        (isOwner(existing().userId) && incoming().diff(existing()).affectedKeys().hasOnly(['read']))
+        || isAdmin()
+      );
+      allow delete: if isAdmin() && belongsToOrg(existing().organizationId);
+    }
+  }
+}
