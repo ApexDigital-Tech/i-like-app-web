@@ -33,6 +33,7 @@
   - Implementación de fondos de superficie premium con desenfoque de cristal (`glass-panel`, `backdrop-blur-2xl`).
   - Control riguroso de contraste con tipografías ultra nítidas en blanco puro, zinc y oro, mejorando drásticamente la legibilidad de metadatos uppercase y textos del navbar.
   - Sincronización del navbar inferior y toolbar con botones simétricos y unificados para una navegación móvil excepcional libre de elementos duplicados.
+  - Optimización extrema de la barra de búsqueda en móviles utilizando un layout adaptativo de dos columnas (`grid-cols-2`) para selectores de operación/tipo y una fila horizontal compacta para el input de texto y botón con icono dorado, reduciendo su volumen vertical en un 50% y eliminando la saturación visual en pantallas móviles.
   - Integración modular de la Asesora IA en un panel tipo drawer de acceso rápido.
 - **Fecha**: 2026-05-17
 
