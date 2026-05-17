@@ -26,34 +26,39 @@
 - **Implementación**: Se purgó la UI redundante y el manejador `handleBroadcast` de `src/App.tsx`. Ahora la comunicación utiliza el método centralizado y estructurado `broadcastNotification` de `useCRMStore()`, asegurando total integridad de tipos y compilación limpia (`tsc --noEmit` exitoso sin errores).
 - **Fecha**: 2026-05-17
 
-### 5. Rediseño Estético Orgánico (Earthy Sanctuary 2026) y Depuración Visual
-- **Problema**: Interfaz oscura muy saturada, elementos flotantes duplicados contaminando visualmente el viewport en móviles y afectando la experiencia editorial premium.
-- **Decisión**: Transformación completa a paleta clara orgánica (Márfil Natural `#F8F6F0`, Terracota `#C06240` y Verde Salvia `#8CA17C`) y remoción del 100% de elementos flotantes superpuestos.
+### 5. Rediseño Estético de Lujo "Pantone Space Navy & Royal Gold" (Alto Contraste 2026)
+- **Problema**: La interfaz clara anterior se percibía blanca, plana, saturada y con falta de contraste y jerarquía de datos.
+- **Decisión**: Transformación completa a una estética premium ultra-oscura basada en la paleta de lujo Pantone Space Navy (`#0a0e1a` y `#101420`), oro real refinado (`#FCC36B` y `#D9A241`), detalles HSL vibrantes y bordes de alta definición (`white/5`).
 - **Implementación**:
-  - Implementación de tipografías premium (`Playfair Display` para editorial, `Outfit` para UI de alta gama).
-  - Centralización del chat interactivo "Asesora IA" en un cajón drawer modular integrado con Zustand, accesible desde la barra superior e inferior de navegación.
-  - Sincronización del navbar móvil inferior en un layout simétrico de 5 botones que limpia completamente el login/logout flotante.
-  - Incorporación del banner de soporte de WhatsApp y el panel de feedback directamente en el modal de ajustes/perfil, despejando la pantalla principal.
+  - Implementación de fondos de superficie premium con desenfoque de cristal (`glass-panel`, `backdrop-blur-2xl`).
+  - Control riguroso de contraste con tipografías ultra nítidas en blanco puro, zinc y oro, mejorando drásticamente la legibilidad de metadatos uppercase y textos del navbar.
+  - Sincronización del navbar inferior y toolbar con botones simétricos y unificados para una navegación móvil excepcional libre de elementos duplicados.
+  - Integración modular de la Asesora IA en un panel tipo drawer de acceso rápido.
+- **Fecha**: 2026-05-17
+
+### 6. Corrección de Ordenamiento de Propiedades y Sincronización de UI
+- **Problema**: Al actualizar, editar o crear una propiedad, el listado general en el frontend no reflejaba inmediatamente el cambio en el orden correcto, dejando las propiedades recién creadas o editadas al final.
+- **Decisión**: Forzar ordenamiento descendente basado en marcas de tiempo en el lado del cliente.
+- **Implementación**: Ajuste del store `propertyStore.ts` para ordenar determinísticamente los listados por el campo `updatedAt` o `createdAt` de manera descendente. Las propiedades más recientes o recién editadas aparecen de inmediato en el tope de la grilla.
 - **Fecha**: 2026-05-17
 
 ## Hitos Logrados
-- **CRM SuperAdmin (Data Command Center)**: Implementado componente profesional `SuperAdminCRM.tsx` con métricas globales, gestión multi-tenant de usuarios, propiedades y solicitudes.
-- **Asesora IA de I LIKE**: Integrada con Google Gemini (modelo `gemini-3-flash-preview`). Soporta *Function Calling* para agendar citas directamente en el CRM.
-- **Normalización de Citas**: Las citas generadas por la IA ahora incluyen automáticamente el `organizationId` del usuario, garantizando visibilidad en el calendario.
-- **Purga de Contaminación Visual**: Eliminación de widgets flotantes duplicados y botones encimados en favor de menús y toolbars nativos y limpios.
-- **Transformación de Diseño 2026**: Nueva arquitectura visual premium "Earthy Sanctuary" con paleta marfil/terracota y bordes orgánicos sutiles.
-- **Compilación de Producción Exitosa**: Vite compila al 100% sin errores de TypeScript ni linter en todo el ecosistema de componentes.
+- **CRM SuperAdmin de Alta Fidelidad**: Panel administrativo completamente funcional que segmenta métricas, controla usuarios en multi-tenancy estricto, gestiona listados y monitorea citas en tiempo real.
+- **Asesora IA de I LIKE**: Integrada con Google Gemini (modelo `gemini-3-flash-preview`). Conecta automáticamente citas y cotizaciones con el CRM respetando el `organizationId`.
+- **Filtro de Orden Dinámico**: Corrección definitiva del orden de renderizado en la grilla principal.
+- **Paleta de Diseño Pantone Space Navy**: Un diseño que cautiva desde el primer vistazo con fondos oscuros profundos y acentos en oro radiante que realzan la exclusividad inmobiliaria.
+- **Compilación de Producción Exitosa**: Vite compila al 100% sin errores de TypeScript ni linter (`Exit code: 0` verificado).
 
 ## Estado Actual de la Aplicación
-1. **Frontend**: React + Vite + Tailwind CSS v4 con arquitectura de tokens orgánicos claros.
+1. **Frontend**: React + Vite + Tailwind CSS v4 con arquitectura de tokens de alta fidelidad oscuros y contrastes optimizados.
 2. **Backend**: Firebase Firestore (Seguridad multi-tenant activa).
 3. **Módulo IA**: Gemini API activa con historial de conversación y herramientas de agenda.
 4. **Despliegue**: [i-like-app-web.vercel.app](https://i-like-app-web.vercel.app).
 
 ## Próximos Pasos (CRM & SuperAdmin)
-1. **Auditoría y Telemetría Avanzada**:
-    - Gráficos de rendimiento real (Carga de Datos).
-2. **Optimización de Datos**:
-    - Implementar paginación en el CRM para manejar volúmenes >500 registros.
-3. **Refinamiento IA**:
-    - Añadir más herramientas a la Asesora (consultar precios promedio, filtrar propiedades por zona vía voz).
+1. **Paginación Dinámica**:
+    - Agregar paginación al CRM y la grilla para colecciones masivas de propiedades.
+2. **Dashboard Financiero**:
+    - Mapeo de comisiones globales del SuperAdmin directo en la UI.
+3. **Optimización SEO/GEO**:
+    - Configurar tags dinámicos OpenGraph para previsualizaciones de propiedades de lujo en redes sociales.
