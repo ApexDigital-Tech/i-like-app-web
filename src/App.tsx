@@ -462,99 +462,104 @@ export default function App() {
                   </p>
 
                   <div className="relative z-50 w-full max-w-5xl mx-auto">
-                    <div className="glass-panel p-1.5 md:p-2 rounded-full flex flex-col md:flex-row items-center gap-1 shadow-[0_30px_100px_rgba(0,0,0,0.4)] border-white/5 group/search transition-all hover:border-white/10">
+                    <div className="glass-panel p-2 md:p-2 rounded-[2rem] md:rounded-full flex flex-col md:flex-row items-center gap-2 shadow-[0_30px_100px_rgba(0,0,0,0.4)] border-white/5 group/search transition-all hover:border-white/10 w-full">
                       
-                      {/* Operación Select */}
-                      <div className="relative w-full md:w-auto">
-                        <button 
-                          onClick={() => { setIsCategoryDropdownOpen(!isCategoryDropdownOpen); setIsTypeDropdownOpen(false); }}
-                          className={`w-full md:w-44 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isCategoryDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'text-zinc-400 hover:text-white'}`}
-                        >
-                          <span className="opacity-60 mr-2 font-medium">Ops:</span>
-                          <span className="flex-1 text-left">{searchCategory === 'Venta' ? t.buy : t.rent}</span>
-                          <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        
-                        <AnimatePresence>
-                          {isCategoryDropdownOpen && (
-                            <>
-                              <div className="fixed inset-0 z-40" onClick={() => setIsCategoryDropdownOpen(false)} />
-                              <motion.div 
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50"
-                              >
-                                {['Venta', 'Renta'].map((cat) => (
-                                  <button
-                                    key={cat}
-                                    onClick={() => { setSearchCategory(cat as any); setIsCategoryDropdownOpen(false); }}
-                                    className={`w-full text-left px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${searchCategory === cat ? 'text-primary bg-white/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-                                  >
-                                    {cat === 'Venta' ? t.buy : t.rent}
-                                  </button>
-                                ))}
-                              </motion.div>
-                            </>
-                          )}
-                        </AnimatePresence>
+                      {/* Selectors Row */}
+                      <div className="grid grid-cols-2 md:flex gap-2 w-full md:w-auto shrink-0">
+                        {/* Operación Select */}
+                        <div className="relative w-full md:w-auto">
+                          <button 
+                            onClick={() => { setIsCategoryDropdownOpen(!isCategoryDropdownOpen); setIsTypeDropdownOpen(false); }}
+                            className={`w-full md:w-44 flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 rounded-[1.2rem] md:rounded-full transition-all text-[10px] md:text-[11px] font-black uppercase tracking-tighter ${isCategoryDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'bg-white/5 text-zinc-450 hover:text-white md:bg-transparent'}`}
+                          >
+                            <span className="opacity-60 mr-1 md:mr-2 font-medium">Ops:</span>
+                            <span className="flex-1 text-left truncate">{searchCategory === 'Venta' ? t.buy : t.rent}</span>
+                            <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          
+                          <AnimatePresence>
+                            {isCategoryDropdownOpen && (
+                              <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsCategoryDropdownOpen(false)} />
+                                <motion.div 
+                                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[1.5rem] md:rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50"
+                                >
+                                  {['Venta', 'Renta'].map((cat) => (
+                                    <button
+                                      key={cat}
+                                      onClick={() => { setSearchCategory(cat as any); setIsCategoryDropdownOpen(false); }}
+                                      className={`w-full text-left px-5 md:px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${searchCategory === cat ? 'text-primary bg-white/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                                    >
+                                      {cat === 'Venta' ? t.buy : t.rent}
+                                    </button>
+                                  ))}
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        {/* Tipo Select */}
+                        <div className="relative w-full md:w-auto">
+                          <button 
+                            onClick={() => { setIsTypeDropdownOpen(!isTypeDropdownOpen); setIsCategoryDropdownOpen(false); }}
+                            className={`w-full md:w-48 flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 rounded-[1.2rem] md:rounded-full transition-all text-[10px] md:text-[11px] font-black uppercase tracking-tighter ${isTypeDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'bg-white/5 text-zinc-450 hover:text-white md:bg-transparent'}`}
+                          >
+                            <span className="opacity-60 mr-1 md:mr-2 font-medium">Tipo:</span>
+                            <span className="flex-1 text-left truncate">{searchType === 'All' ? t.all_types : t[searchType.toLowerCase() + 's' as keyof typeof t] || searchType}</span>
+                            <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          
+                          <AnimatePresence>
+                            {isTypeDropdownOpen && (
+                              <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsTypeDropdownOpen(false)} />
+                                <motion.div 
+                                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[1.5rem] md:rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50 max-h-[300px] overflow-y-auto custom-scrollbar"
+                                >
+                                  {['All', 'House', 'Apartment', 'Land', 'Office', 'Other'].map((type) => (
+                                    <button
+                                      key={type}
+                                      onClick={() => { setSearchType(type as any); setIsTypeDropdownOpen(false); }}
+                                      className={`w-full text-left px-5 md:px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${searchType === type ? 'text-primary bg-white/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                                    >
+                                      {type === 'All' ? t.all_types : t[type.toLowerCase() + 's' as keyof typeof t] || type}
+                                    </button>
+                                  ))}
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       </div>
 
                       <div className="hidden md:block h-8 w-px bg-white/5" />
 
-                      {/* Tipo Select */}
-                      <div className="relative w-full md:w-auto">
-                        <button 
-                          onClick={() => { setIsTypeDropdownOpen(!isTypeDropdownOpen); setIsCategoryDropdownOpen(false); }}
-                          className={`w-full md:w-48 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isTypeDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'text-zinc-400 hover:text-white'}`}
-                        >
-                          <span className="opacity-60 mr-2 font-medium">Tipo:</span>
-                          <span className="flex-1 text-left truncate">{searchType === 'All' ? t.all_types : t[searchType.toLowerCase() + 's' as keyof typeof t] || searchType}</span>
-                          <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                      {/* Input & Action Row */}
+                      <div className="flex items-center gap-2 w-full md:flex-1">
+                        {/* Search Input */}
+                        <div className="flex-1 relative">
+                          <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+                          <input 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Ubicación o Red..."
+                            className="w-full bg-white/5 md:bg-transparent border-none py-3.5 md:py-5 pl-11 md:pl-14 pr-4 text-xs md:text-sm text-white focus:outline-none placeholder:text-zinc-500 font-display font-medium rounded-[1.2rem] md:rounded-none"
+                          />
+                        </div>
+
+                        {/* Action Button */}
+                        <button className="bg-primary text-[#101420] p-3.5 md:px-10 md:py-4 rounded-[1.2rem] md:rounded-full font-display font-black text-[11px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(252,195,107,0.25)] hover:bg-primary-dim shrink-0 flex items-center justify-center gap-2 min-w-[48px] md:min-w-0">
+                          <Search className="w-4 h-4 md:hidden" />
+                          <span className="hidden md:inline">{t.search}</span>
                         </button>
-                        
-                        <AnimatePresence>
-                          {isTypeDropdownOpen && (
-                            <>
-                              <div className="fixed inset-0 z-40" onClick={() => setIsTypeDropdownOpen(false)} />
-                              <motion.div 
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50 max-h-[350px] overflow-y-auto custom-scrollbar"
-                              >
-                                {['All', 'House', 'Apartment', 'Land', 'Office', 'Other'].map((type) => (
-                                  <button
-                                    key={type}
-                                    onClick={() => { setSearchType(type as any); setIsTypeDropdownOpen(false); }}
-                                    className={`w-full text-left px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${searchType === type ? 'text-primary bg-white/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-                                  >
-                                    {type === 'All' ? t.all_types : t[type.toLowerCase() + 's' as keyof typeof t] || type}
-                                  </button>
-                                ))}
-                              </motion.div>
-                            </>
-                          )}
-                        </AnimatePresence>
                       </div>
-
-                      <div className="hidden md:block h-8 w-px bg-white/5" />
-
-                      {/* Search Input */}
-                      <div className="flex-1 w-full relative">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
-                        <input 
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                          placeholder="Ubicación o Red..."
-                          className="w-full bg-transparent border-none py-4 md:py-5 pl-14 pr-6 text-sm text-white focus:outline-none placeholder:text-zinc-500 font-display font-medium"
-                        />
-                      </div>
-
-                      {/* Action Button */}
-                      <button className="w-full md:w-auto bg-primary text-[#101420] px-10 py-4 rounded-full font-display font-black text-[11px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(252,195,107,0.25)] hover:bg-primary-dim">
-                        {t.search}
-                      </button>
                     </div>
                   </div>
                 </div>
