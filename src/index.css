@@ -1,53 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
 
-  --color-surface: #172B36; /* Oceanic Noir */
-  --color-surface-card: #114C5A; /* Nocturnal Expedition */
-  --color-primary: #FFC801; /* Forsythia (Yellow) */
-  --color-primary-dim: #FF9932; /* Deep Saffron (Orange) */
-  --color-secondary: #D9E8E2; /* Mystic Mint */
-  --color-tertiary: #F1F6F4; /* Arctic Powder */
-  --color-outline: rgba(241, 246, 244, 0.05);
-  --color-outline-variant: rgba(255, 200, 1, 0.2);
+  --color-surface: #101420; /* Very deep Lazuli Indigo night base */
+  --color-surface-card: #1c2234; /* Rich Slate Lazuli card background */
+  --color-primary: #F2C36B; /* Honeycomb Yellow/Gold primary (high-contrast action) */
+  --color-primary-dim: #D08F6B; /* Fade Citrus warm orange hover highlight */
+  --color-secondary: #86947A; /* Jade green subtle success/active borders */
+  --color-tertiary: #A9A4C9; /* Digital Violet accents/headings */
+  --color-accent: #942F67; /* Orchid Rose luxury details/highlights */
+  --color-dark-oak: #423834; /* Dark Oak structural base */
+  --color-outline: rgba(169, 164, 201, 0.12); /* Digital Violet soft glowing borders */
+  --color-outline-variant: rgba(242, 195, 107, 0.2);
 
-  --radius-3xl: 2.5rem;
-  --radius-2xl: 1.5rem;
-  --radius-xl: 1rem;
+  /* Subtle minimal rounded geometry */
+  --radius-3xl: 1.25rem;
+  --radius-2xl: 0.875rem;
+  --radius-xl: 0.625rem;
 }
 
 @layer base {
   body {
-    @apply bg-surface text-[#F1F6F4] font-sans antialiased;
+    @apply bg-surface text-zinc-200 font-sans antialiased;
     background-image: 
-      radial-gradient(circle at top right, rgba(255, 200, 1, 0.1), transparent 50%),
-      radial-gradient(circle at bottom left, rgba(17, 76, 90, 0.2), transparent 50%);
+      radial-gradient(circle at top right, rgba(148, 47, 103, 0.08), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(44, 59, 100, 0.35), transparent 70%);
     background-attachment: fixed;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-surface-card/40 backdrop-blur-3xl;
-    border: 1px solid rgba(241, 246, 244, 0.08);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    @apply bg-surface-card/95 backdrop-blur-3xl;
+    border: 1px solid var(--color-outline);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .btn-joy {
-    @apply relative overflow-hidden bg-primary text-[#172B36] font-display font-black uppercase tracking-widest text-[10px] py-3 px-6 rounded-2xl transition-all hover:scale-105 active:scale-95 hover:shadow-[0_0_30px_rgba(255,200,1,0.4)] disabled:opacity-50;
+    @apply relative overflow-hidden bg-primary text-[#101420] font-display font-black uppercase tracking-widest text-[9.5px] py-3.5 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-95 hover:shadow-[0_4px_16px_rgba(242,195,107,0.35)] hover:bg-primary-dim disabled:opacity-50;
   }
 
   .glow-text-primary {
-    @apply text-primary;
-    text-shadow: 0 0 30px rgba(255, 200, 1, 0.5);
+    @apply text-primary font-bold;
+    text-shadow: 0 0 15px rgba(242, 195, 107, 0.15);
   }
 
   .neon-border {
-    @apply border border-primary/20;
-    box-shadow: 0 0 20px rgba(255, 200, 1, 0.1);
+    @apply border border-primary/20 shadow-[0_0_12px_rgba(242,195,107,0.08)];
   }
 
   .bento-grid {
@@ -58,13 +60,11 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+  @apply bg-[#A9A4C9]/20 rounded-full hover:bg-primary/30 transition-colors;
 }
-
-/* placeholder */

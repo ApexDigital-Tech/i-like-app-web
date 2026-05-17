@@ -109,13 +109,16 @@ export default function App() {
     markNotificationRead,
     markAllNotificationsRead,
     updateAppointment,
-    addNotification
+    addNotification,
+    broadcastNotification
   } = useCRMStore();
 
   const { activeModal, setActiveModal, modalData } = useUIStore();
 
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+
+
 
   const t = TRANSLATIONS[lang];
 
@@ -228,6 +231,8 @@ export default function App() {
     setActiveModal('add_appointment');
   };
 
+
+
   const NavItem = ({ id, label, icon: Icon }: { id: ViewState; label: string; icon: any }) => (
     <button
       onClick={() => setView(id)}
@@ -291,6 +296,17 @@ export default function App() {
           <NavItem id="CALENDAR" label={t.calendar} icon={Calendar} />
           <NavItem id="PORTFOLIO" label={t.portfolio} icon={Wallet} />
           <NavItem id="DETAILS" label={t.network} icon={Globe} />
+          <button
+            onClick={() => setActiveModal('ai_advisor')}
+            className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 font-display uppercase text-xs tracking-widest ${
+              activeModal === 'ai_advisor'
+                ? 'bg-primary/10 text-primary border-r-4 border-primary'
+                : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800'
+            }`}
+          >
+            <Bot className="w-5 h-5" />
+            <span className="hidden md:block font-bold">Asesora IA</span>
+          </button>
         </nav>
 
         <div className="p-8 border-t border-white/5 space-y-6">
@@ -311,7 +327,7 @@ export default function App() {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] glass-panel rounded-[2rem] z-50 px-6 py-4 flex items-center justify-between shadow-2xl border-white/10">
+      <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] glass-panel rounded-[2rem] z-50 px-6 py-4 flex items-center justify-between shadow-2xl border-outline bg-surface-card/95">
         <button onClick={() => setView('MARKET')} className={`p-2 transition-all ${view === 'MARKET' ? 'text-primary scale-110' : 'text-zinc-500'}`}>
            <Building2 className="w-6 h-6" />
         </button>
@@ -320,35 +336,16 @@ export default function App() {
         </button>
         <button 
           onClick={() => isLoggedIn ? setActiveModal('add_property') : setActiveModal('login')}
-          className="relative -mt-16 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-[#172B36] shadow-[0_10px_30px_rgba(255,200,1,0.5)] border-4 border-surface active:scale-95 transition-transform"
+          className="relative -mt-14 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white shadow-md active:scale-95 transition-transform"
         >
-           <Plus className="w-7 h-7" />
+           <Plus className="w-6 h-6" />
         </button>
-        <button onClick={() => setView('PORTFOLIO')} className={`p-2 transition-all ${view === 'PORTFOLIO' ? 'text-primary scale-110' : 'text-zinc-500'}`}>
-           <Wallet className="w-6 h-6" />
+        <button onClick={() => setActiveModal('ai_advisor')} className={`p-2 transition-all ${activeModal === 'ai_advisor' ? 'text-primary scale-110' : 'text-zinc-500'}`}>
+           <Bot className="w-6 h-6" />
         </button>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setActiveModal('settings')} className="p-2 text-zinc-500 hover:text-white transition-colors">
-             <User className="w-6 h-6" />
-          </button>
-          {isLoggedIn ? (
-            <button 
-              onClick={() => logout()} 
-              className="p-2 ml-2 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all border border-red-500/20"
-              title={t.logout}
-            >
-               <LogOut className="w-6 h-6" />
-            </button>
-          ) : (
-            <button 
-              onClick={() => login()} 
-              className="p-2 ml-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-all border border-primary/20"
-              title={t.login}
-            >
-               <User className="w-6 h-6" />
-            </button>
-          )}
-        </div>
+        <button onClick={() => setActiveModal('settings')} className={`p-2 transition-all ${activeModal === 'settings' ? 'text-primary scale-110' : 'text-zinc-500'}`}>
+           <User className="w-6 h-6" />
+        </button>
       </nav>
 
       {/* Main Content */}
@@ -375,16 +372,16 @@ export default function App() {
             <div className="flex items-center gap-3 md:gap-5">
               {isLoggedIn && (
                 <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-[10px] font-black text-white uppercase tracking-widest">{profile?.name}</span>
+                  <span className="text-[10px] font-black text-zinc-100 uppercase tracking-widest">{profile?.name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">
+                    <span className="text-[8px] font-black text-zinc-450 uppercase tracking-widest">
                       {profile?.role === 'superadmin' ? t.superadmin_role : 
                        profile?.role === 'Admin' ? t.admin_role : 
                        profile?.role === 'Seller' ? t.seller : t.buyer}
                     </span>
                     <button 
                       onClick={() => logout()}
-                      className="px-3 py-1 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 border border-red-500/20"
+                      className="px-3 py-1 bg-red-500/10 text-red-550 hover:bg-red-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 border border-red-500/20"
                     >
                       <LogOut className="w-3 h-3" /> {t.logout}
                     </button>
@@ -392,12 +389,12 @@ export default function App() {
                 </div>
               )}
               
-              <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
+              <div className="flex bg-[#1c2234] rounded-full p-1 border border-white/5">
                 {['en', 'es', 'pt'].map(l => (
                   <button
                     key={l}
                     onClick={() => setLang(l as any)}
-                    className={`px-2 md:px-3 py-1 text-[9px] font-black uppercase rounded-full transition-all ${lang === l ? 'bg-primary text-[#172B36]' : 'text-zinc-500 hover:text-white'}`}
+                    className={`px-2 md:px-3 py-1 text-[9px] font-black uppercase rounded-full transition-all ${lang === l ? 'bg-primary text-[#101420] font-black' : 'text-zinc-450 hover:text-white'}`}
                   >
                     {l}
                   </button>
@@ -406,8 +403,18 @@ export default function App() {
 
               <div className="flex items-center gap-1 md:gap-2">
                 <button 
+                  onClick={() => setActiveModal('ai_advisor')}
+                  className={`p-2 transition-all relative ${
+                    activeModal === 'ai_advisor' ? 'text-primary scale-110' : 'text-zinc-400 hover:text-primary'
+                  }`}
+                  title="Preguntar a Asesora IA"
+                >
+                  <Bot className="w-5 h-5" />
+                </button>
+
+                <button 
                   onClick={() => setActiveModal('notifications')}
-                  className="p-2 text-zinc-500 hover:text-primary transition-all relative"
+                  className="p-2 text-zinc-400 hover:text-primary transition-all relative"
                 >
                   <Bell className="w-5 h-5" />
                   {notifications.filter(n => !n.read).length > 0 && (
@@ -415,7 +422,7 @@ export default function App() {
                   )}
                 </button>
                 <div 
-                  className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/20 p-0.5 overflow-hidden cursor-pointer hover:border-primary transition-all ring-primary/20 hover:ring-4 active:scale-95"
+                  className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/5 p-0.5 overflow-hidden cursor-pointer hover:border-primary transition-all ring-primary/20 hover:ring-4 active:scale-95"
                   onClick={() => !isLoggedIn ? login().then(() => setActiveModal('none')) : setActiveModal('settings')}
                 >
                   <img src={isLoggedIn ? profile?.image : "https://img.icons8.com/ios-filled/50/666666/user-male-circle.png"} className="w-full h-full object-cover rounded-full" alt="User" />
@@ -461,7 +468,7 @@ export default function App() {
                       <div className="relative w-full md:w-auto">
                         <button 
                           onClick={() => { setIsCategoryDropdownOpen(!isCategoryDropdownOpen); setIsTypeDropdownOpen(false); }}
-                          className={`w-full md:w-44 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isCategoryDropdownOpen ? 'bg-primary text-[#172B36]' : 'text-zinc-400 hover:text-white'}`}
+                          className={`w-full md:w-44 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isCategoryDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'text-zinc-400 hover:text-white'}`}
                         >
                           <span className="opacity-60 mr-2 font-medium">Ops:</span>
                           <span className="flex-1 text-left">{searchCategory === 'Venta' ? t.buy : t.rent}</span>
@@ -476,7 +483,7 @@ export default function App() {
                                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="absolute top-full left-0 w-full mt-3 bg-[#114C5A]/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50"
+                                className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50"
                               >
                                 {['Venta', 'Renta'].map((cat) => (
                                   <button
@@ -499,7 +506,7 @@ export default function App() {
                       <div className="relative w-full md:w-auto">
                         <button 
                           onClick={() => { setIsTypeDropdownOpen(!isTypeDropdownOpen); setIsCategoryDropdownOpen(false); }}
-                          className={`w-full md:w-48 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isTypeDropdownOpen ? 'bg-primary text-[#172B36]' : 'text-zinc-400 hover:text-white'}`}
+                          className={`w-full md:w-48 flex items-center justify-between px-6 py-4 rounded-full transition-all text-[11px] font-black uppercase tracking-tighter ${isTypeDropdownOpen ? 'bg-primary text-[#101420] font-black' : 'text-zinc-400 hover:text-white'}`}
                         >
                           <span className="opacity-60 mr-2 font-medium">Tipo:</span>
                           <span className="flex-1 text-left truncate">{searchType === 'All' ? t.all_types : t[searchType.toLowerCase() + 's' as keyof typeof t] || searchType}</span>
@@ -514,7 +521,7 @@ export default function App() {
                                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="absolute top-full left-0 w-full mt-3 bg-[#114C5A]/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50 max-h-[350px] overflow-y-auto custom-scrollbar"
+                                className="absolute top-full left-0 w-full mt-3 bg-[#1c2234]/95 backdrop-blur-2xl border border-outline rounded-[2rem] overflow-hidden py-3 shadow-2xl z-50 max-h-[350px] overflow-y-auto custom-scrollbar"
                               >
                                 {['All', 'House', 'Apartment', 'Land', 'Office', 'Other'].map((type) => (
                                   <button
@@ -540,12 +547,12 @@ export default function App() {
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
                           placeholder="Ubicación o Red..."
-                          className="w-full bg-transparent border-none py-4 md:py-5 pl-14 pr-6 text-sm text-white focus:outline-none placeholder:text-zinc-600 font-display font-medium"
+                          className="w-full bg-transparent border-none py-4 md:py-5 pl-14 pr-6 text-sm text-white focus:outline-none placeholder:text-zinc-500 font-display font-medium"
                         />
                       </div>
 
                       {/* Action Button */}
-                      <button className="w-full md:w-auto bg-primary text-[#172B36] px-10 py-4 rounded-full font-display font-black text-[11px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_10px_30px_rgba(255,200,1,0.3)]">
+                      <button className="w-full md:w-auto bg-primary text-[#101420] px-10 py-4 rounded-full font-display font-black text-[11px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(252,195,107,0.25)] hover:bg-primary-dim">
                         {t.search}
                       </button>
                     </div>
@@ -700,17 +707,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="glass-panel p-8 rounded-3xl border border-secondary/20">
-                     <div className="flex items-center gap-3 mb-4">
-                        <Zap className="w-5 h-5 text-secondary" />
-                        <h3 className="font-display font-bold text-sm text-white uppercase tracking-widest">Global Broadcast</h3>
-                     </div>
-                     <p className="text-zinc-400 text-xs mb-6 leading-relaxed italic">Broadcast system-wide notifications or critical market updates to all active nodes.</p>
-                     <textarea className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-xs h-24 mb-4 focus:outline-none focus:border-secondary transition-all" placeholder="Enter transmission data..." />
-                     <button className="w-full bg-secondary text-black py-3 rounded-xl font-display font-black uppercase tracking-widest text-[10px] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                        Initialize Transmission
-                     </button>
-                  </div>
+
                 </div>
               </div>
             </motion.div>
@@ -1005,31 +1002,6 @@ export default function App() {
       </main>
 
       <AINexus />
-
-      {/* Suggestion Box */}
-      <div className="fixed bottom-32 right-8 md:bottom-28 z-50">
-        <button 
-          onClick={() => setActiveModal('settings')}
-          className="p-3 bg-white/5 border border-white/10 rounded-xl text-zinc-500 hover:text-white transition-all hover:border-white/30 group relative shadow-2xl backdrop-blur-md"
-        >
-          <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform" />
-          <span className="absolute right-full mr-4 whitespace-nowrap bg-black p-2 rounded text-[10px] font-bold uppercase opacity-0 group-hover:opacity-100 transition-opacity border border-white/10">Submit Suggestion</span>
-        </button>
-      </div>
-
-      {/* Floating Action Buttons Container - Ensures No Overlap */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-4">
-        <AINexus />
-        <a 
-          href="https://wa.me/59178756107" 
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center w-10 h-10 bg-[#25D366] text-white rounded-full shadow-[0_10px_40px_rgba(37,211,102,0.5)] hover:scale-110 active:scale-95 transition-all group border border-white/20"
-          title="Soporte WhatsApp"
-        >
-          <Phone className="w-4 h-4 animate-pulse group-hover:animate-none" />
-        </a>
-      </div>
 
       {/* Modals Section */}
       <AnimatePresence>

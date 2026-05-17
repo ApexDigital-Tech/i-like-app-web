@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { PropertyRequest, Appointment, AppNotification } from '../../../types';
+import { PropertyRequest, Appointment, AppNotification, UserProfile } from '../../../types';
 import { crmService } from '../services/crmService';
 
 interface CRMState {
@@ -25,6 +25,13 @@ interface CRMState {
   markNotificationRead: (id: string, organizationId: string) => Promise<void>;
   markAllNotificationsRead: (userId: string | undefined, isAdmin: boolean, organizationId: string) => Promise<void>;
   addNotification: (notification: Partial<AppNotification>, organizationId: string) => Promise<void>;
+  broadcastNotification: (
+    notification: Partial<AppNotification>,
+    targetUsers: UserProfile[],
+    senderId: string,
+    organizationId: string,
+    onProgress?: (sentCount: number, totalCount: number) => void
+  ) => Promise<void>;
 }
 
 export const useCRMStore = create<CRMState>((set, get) => ({
@@ -86,6 +93,10 @@ export const useCRMStore = create<CRMState>((set, get) => ({
 
   addNotification: async (notification, organizationId) => {
     await crmService.addNotification(notification, organizationId);
+  },
+
+  broadcastNotification: async (notification, targetUsers, senderId, organizationId, onProgress) => {
+    await crmService.broadcastNotification(notification, targetUsers, senderId, organizationId, onProgress);
   }
 }));
 

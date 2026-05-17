@@ -11,7 +11,8 @@ export type ModalType =
   | 'add_appointment' 
   | 'notifications' 
   | 'edit_outcome' 
-  | 'reschedule';
+  | 'reschedule'
+  | 'ai_advisor';
 
 interface ModalData {
   propertyToEdit?: Property | null;

@@ -16,7 +16,7 @@ export const Modal: React.FC<ModalProps> = ({ title, children }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm"
       onClick={closeModal}
     >
       <motion.div
@@ -28,11 +28,11 @@ export const Modal: React.FC<ModalProps> = ({ title, children }) => {
       >
         <button 
           onClick={closeModal}
-          className="absolute top-6 right-6 text-zinc-500 hover:text-white"
+          className="absolute top-6 right-6 text-zinc-400 hover:text-primary transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
-        <h2 className="text-2xl font-display font-black text-white uppercase tracking-widest mb-8 flex items-center gap-3">
+        <h2 className="text-xl font-display font-black text-zinc-100 uppercase tracking-widest mb-8 flex items-center gap-3">
           {title}
         </h2>
         {children}

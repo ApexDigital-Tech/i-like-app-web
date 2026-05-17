@@ -8,10 +8,11 @@ import {
   updateDoc, 
   doc, 
   serverTimestamp,
-  Unsubscribe
+  Unsubscribe,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { PropertyRequest, Appointment, AppNotification } from '../../../types';
+import { PropertyRequest, Appointment, AppNotification, UserProfile } from '../../../types';
 
 export const crmService = {
   /**
@@ -167,6 +168,52 @@ export const crmService = {
       const sorted = [...apps].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
       callback(sorted);
     });
+  },
+
+  /**
+   * Transmitir una notificación a múltiples usuarios en lotes (batches) de 500
+   */
+  broadcastNotification: async (
+    notification: Partial<AppNotification>,
+    targetUsers: UserProfile[],
+    senderId: string,
+    organizationId: string,
+    onProgress?: (sentCount: number, total: number) => void
+  ): Promise<void> => {
+    const recipients = targetUsers.filter(u => u.id && u.id !== senderId);
+    const total = recipients.length;
+    
+    if (total === 0) {
+      if (onProgress) onProgress(0, 0);
+      return;
+    }
+
+    const chunkSize = 500;
+    let sentCount = 0;
+
+    for (let i = 0; i < recipients.length; i += chunkSize) {
+      const chunk = recipients.slice(i, i + chunkSize);
+      const batch = writeBatch(db);
+
+      for (const recipient of chunk) {
+        const docRef = doc(collection(db, 'notifications'));
+        batch.set(docRef, {
+          userId: recipient.id,
+          organizationId: recipient.organizationId || organizationId,
+          title: notification.title || '',
+          message: notification.message || '',
+          type: notification.type || 'info',
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      await batch.commit();
+      sentCount += chunk.length;
+      if (onProgress) {
+        onProgress(sentCount, total);
+      }
+    }
   }
 };
 
